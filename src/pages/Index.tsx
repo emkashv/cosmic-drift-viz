@@ -2,6 +2,7 @@ import { SpaceHero } from "@/components/SpaceHero";
 import { PlanetCard } from "@/components/PlanetCard";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { FloatingElement } from "@/components/FloatingElement";
+import { Scroll3DContainer } from "@/components/Scroll3DContainer";
 import { Sparkles, Orbit, Telescope } from "lucide-react";
 import { useInViewAnimation } from "@/hooks/useInViewAnimation";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -72,7 +73,7 @@ const Index = () => {
       <SpaceHero />
       
       {/* Planets Section */}
-      <section className="relative py-24 px-4">
+      <section className="relative py-24 px-4 perspective-container">
         <div 
           className="absolute inset-0 opacity-30 transition-opacity duration-1000"
           style={{ 
@@ -86,7 +87,7 @@ const Index = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto">
-          <ParallaxSection speed={0.15}>
+          <Scroll3DContainer intensity={0.8}>
             <div className="text-center mb-16">
               <h2 className="text-5xl md:text-6xl font-bold mb-4 text-gradient">
                 Journey Through Worlds
@@ -95,7 +96,7 @@ const Index = () => {
                 Discover the magnificent planets that orbit our Sun, each with its own story to tell
               </p>
             </div>
-          </ParallaxSection>
+          </Scroll3DContainer>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {planets.map((planet, index) => (
@@ -108,7 +109,7 @@ const Index = () => {
       </section>
 
       {/* Discoveries Section */}
-      <section ref={discoverySection.ref} className="relative py-24 px-4 bg-muted/30 overflow-hidden">
+      <section ref={discoverySection.ref} className="relative py-24 px-4 bg-muted/30 overflow-hidden perspective-container">
         {/* Animated background particles */}
         <div className="absolute inset-0 opacity-20">
           {[...Array(20)].map((_, i) => (
@@ -126,27 +127,28 @@ const Index = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative">
-          <ParallaxSection speed={0.2}>
+          <Scroll3DContainer intensity={0.6}>
             <h2 className="text-5xl md:text-6xl font-bold text-center mb-16 text-gradient">
               Cosmic Discoveries
             </h2>
-          </ParallaxSection>
+          </Scroll3DContainer>
 
           <div className="grid md:grid-cols-3 gap-8">
             {discoveries.map((discovery, index) => {
               const Icon = discovery.icon;
               return (
                 <FloatingElement key={discovery.title} delay={index * 0.3} duration={8 + index}>
-                  <div 
-                    className={`text-center p-8 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm transition-all duration-700 ease-out ${
-                      discoverySection.isInView 
-                        ? 'opacity-100 translate-y-0 hover:border-cosmic-purple hover:shadow-2xl hover:scale-105' 
-                        : 'opacity-0 translate-y-12'
-                    }`}
-                    style={{ 
-                      transitionDelay: `${index * 0.2}s`,
-                    }}
-                  >
+                  <Scroll3DContainer intensity={0.4}>
+                    <div 
+                      className={`text-center p-8 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm transition-all duration-700 ease-out preserve-3d ${
+                        discoverySection.isInView 
+                          ? 'opacity-100 translate-y-0 hover:border-cosmic-purple hover:shadow-2xl hover:scale-105' 
+                          : 'opacity-0 translate-y-12'
+                      }`}
+                      style={{ 
+                        transitionDelay: `${index * 0.2}s`,
+                      }}
+                    >
                     <div className="inline-block p-4 rounded-full bg-cosmic-purple/20 mb-4 transition-all duration-500 hover:bg-cosmic-purple/30 hover:scale-110">
                       <Icon className="h-8 w-8 text-cosmic-purple" />
                     </div>
@@ -155,8 +157,9 @@ const Index = () => {
                     </h3>
                     <p className="text-muted-foreground transition-all duration-300">
                       {discovery.description}
-                    </p>
-                  </div>
+                      </p>
+                    </div>
+                  </Scroll3DContainer>
                 </FloatingElement>
               );
             })}
@@ -165,7 +168,7 @@ const Index = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="relative py-32 px-4 overflow-hidden">
+      <section className="relative py-32 px-4 overflow-hidden perspective-container">
         <div className="absolute inset-0">
           {[...Array(40)].map((_, i) => (
             <div
@@ -186,25 +189,27 @@ const Index = () => {
         </div>
 
         <ParallaxSection speed={0.25}>
-          <div className="relative text-center max-w-3xl mx-auto">
-            <h2 
-              className="text-5xl md:text-6xl font-bold mb-6 text-gradient"
-              style={{
-                transform: `translateY(${scrollProgress * -20}px)`,
-              }}
-            >
-              The Universe Awaits
-            </h2>
-            <p 
-              className="text-xl text-muted-foreground mb-8"
-              style={{
-                transform: `translateY(${scrollProgress * -10}px)`,
-              }}
-            >
-              Every star, every planet, every nebula holds countless wonders yet to be discovered. 
-              The cosmos is infinite, and so are the possibilities.
-            </p>
-          </div>
+          <Scroll3DContainer intensity={1}>
+            <div className="relative text-center max-w-3xl mx-auto">
+              <h2 
+                className="text-5xl md:text-6xl font-bold mb-6 text-gradient"
+                style={{
+                  transform: `translateY(${scrollProgress * -20}px)`,
+                }}
+              >
+                The Universe Awaits
+              </h2>
+              <p 
+                className="text-xl text-muted-foreground mb-8"
+                style={{
+                  transform: `translateY(${scrollProgress * -10}px)`,
+                }}
+              >
+                Every star, every planet, every nebula holds countless wonders yet to be discovered. 
+                The cosmos is infinite, and so are the possibilities.
+              </p>
+            </div>
+          </Scroll3DContainer>
         </ParallaxSection>
       </section>
     </div>

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useInViewAnimation } from "@/hooks/useInViewAnimation";
+import { use3DScroll } from "@/hooks/use3DScroll";
 
 interface PlanetCardProps {
   name: string;
@@ -11,21 +12,38 @@ interface PlanetCardProps {
 }
 
 export const PlanetCard = ({ name, description, image, facts, index }: PlanetCardProps) => {
-  const { ref, isInView } = useInViewAnimation({ threshold: 0.2, triggerOnce: true });
+  const { ref: inViewRef, isInView } = useInViewAnimation({ threshold: 0.2, triggerOnce: true });
+  const cardRef = useRef<HTMLDivElement>(null);
+  const transform3D = use3DScroll({ ref: cardRef, intensity: 0.5 });
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Card
-      ref={ref}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-700 ease-out ${
-        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      } ${isHovered ? "border-cosmic-blue scale-105 shadow-2xl" : ""}`}
-      style={{ 
-        transitionDelay: `${index * 0.15}s`,
+    <div
+      ref={(node) => {
+        if (node) {
+          // @ts-ignore
+          inViewRef.current = node;
+          cardRef.current = node;
+        }
       }}
+      className="perspective-container"
     >
+      <Card
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-700 ease-out preserve-3d ${
+          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        } ${isHovered ? "border-cosmic-blue shadow-2xl" : ""}`}
+        style={{ 
+          transitionDelay: `${index * 0.15}s`,
+          transform: `
+            rotateX(${transform3D.rotateX}deg)
+            rotateY(${transform3D.rotateY}deg)
+            translateZ(${transform3D.translateZ}px)
+            scale(${isHovered ? 1.05 : transform3D.scale})
+          `,
+        }}
+      >
       <div className="relative h-64 overflow-hidden group">
         <img
           src={image}
@@ -75,5 +93,6 @@ export const PlanetCard = ({ name, description, image, facts, index }: PlanetCar
         </div>
       </div>
     </Card>
+    </div>
   );
 };
