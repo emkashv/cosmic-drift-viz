@@ -3,11 +3,16 @@ import { PlanetCard } from "@/components/PlanetCard";
 import { ParallaxSection } from "@/components/ParallaxSection";
 import { FloatingElement } from "@/components/FloatingElement";
 import { Sparkles, Orbit, Telescope } from "lucide-react";
+import { useInViewAnimation } from "@/hooks/useInViewAnimation";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import planetEarth from "@/assets/planet-earth.jpg";
 import planetMars from "@/assets/planet-mars.jpg";
 import planetJupiter from "@/assets/planet-jupiter.jpg";
 
 const Index = () => {
+  const { scrollProgress } = useScrollAnimation();
+  const discoverySection = useInViewAnimation({ threshold: 0.2, triggerOnce: true });
+
   const planets = [
     {
       name: "Earth",
@@ -68,7 +73,12 @@ const Index = () => {
       
       {/* Planets Section */}
       <section className="relative py-24 px-4">
-        <div className="absolute inset-0 opacity-30">
+        <div 
+          className="absolute inset-0 opacity-30 transition-opacity duration-1000"
+          style={{ 
+            opacity: 0.3 + scrollProgress * 0.2,
+          }}
+        >
           <div 
             className="absolute inset-0"
             style={{ background: 'var(--gradient-nebula)' }}
@@ -76,7 +86,7 @@ const Index = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto">
-          <ParallaxSection speed={0.2}>
+          <ParallaxSection speed={0.15}>
             <div className="text-center mb-16">
               <h2 className="text-5xl md:text-6xl font-bold mb-4 text-gradient">
                 Journey Through Worlds
@@ -89,7 +99,7 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {planets.map((planet, index) => (
-              <FloatingElement key={planet.name} delay={index * 0.2}>
+              <FloatingElement key={planet.name} delay={index * 0.2} duration={7 + index}>
                 <PlanetCard {...planet} index={index} />
               </FloatingElement>
             ))}
@@ -98,9 +108,25 @@ const Index = () => {
       </section>
 
       {/* Discoveries Section */}
-      <section className="relative py-24 px-4 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <ParallaxSection speed={0.3}>
+      <section ref={discoverySection.ref} className="relative py-24 px-4 bg-muted/30 overflow-hidden">
+        {/* Animated background particles */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={`bg-particle-${i}`}
+              className="absolute w-2 h-2 bg-cosmic-blue rounded-full animate-drift"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 10}s`,
+                animationDuration: `${15 + Math.random() * 10}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <ParallaxSection speed={0.2}>
             <h2 className="text-5xl md:text-6xl font-bold text-center mb-16 text-gradient">
               Cosmic Discoveries
             </h2>
@@ -110,15 +136,24 @@ const Index = () => {
             {discoveries.map((discovery, index) => {
               const Icon = discovery.icon;
               return (
-                <FloatingElement key={discovery.title} delay={index * 0.3} duration={7}>
-                  <div className="text-center p-8 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm hover:border-cosmic-purple transition-all duration-500 hover:glow-accent">
-                    <div className="inline-block p-4 rounded-full bg-cosmic-purple/20 mb-4">
+                <FloatingElement key={discovery.title} delay={index * 0.3} duration={8 + index}>
+                  <div 
+                    className={`text-center p-8 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm transition-all duration-700 ease-out ${
+                      discoverySection.isInView 
+                        ? 'opacity-100 translate-y-0 hover:border-cosmic-purple hover:shadow-2xl hover:scale-105' 
+                        : 'opacity-0 translate-y-12'
+                    }`}
+                    style={{ 
+                      transitionDelay: `${index * 0.2}s`,
+                    }}
+                  >
+                    <div className="inline-block p-4 rounded-full bg-cosmic-purple/20 mb-4 transition-all duration-500 hover:bg-cosmic-purple/30 hover:scale-110">
                       <Icon className="h-8 w-8 text-cosmic-purple" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-3 text-cosmic-blue">
+                    <h3 className="text-2xl font-bold mb-3 text-cosmic-blue transition-all duration-300">
                       {discovery.title}
                     </h3>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground transition-all duration-300">
                       {discovery.description}
                     </p>
                   </div>
@@ -132,26 +167,40 @@ const Index = () => {
       {/* Final CTA Section */}
       <section className="relative py-32 px-4 overflow-hidden">
         <div className="absolute inset-0">
-          {[...Array(30)].map((_, i) => (
+          {[...Array(40)].map((_, i) => (
             <div
-              key={i}
-              className="absolute w-2 h-2 bg-cosmic-blue rounded-full animate-drift"
+              key={`cta-particle-${i}`}
+              className="absolute rounded-full animate-drift"
               style={{
+                width: `${Math.random() * 3 + 1}px`,
+                height: `${Math.random() * 3 + 1}px`,
+                backgroundColor: i % 2 === 0 ? 'hsl(var(--cosmic-blue))' : 'hsl(var(--cosmic-purple))',
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                opacity: Math.random() * 0.5 + 0.2,
+                animationDelay: `${Math.random() * 10}s`,
+                animationDuration: `${12 + Math.random() * 8}s`,
+                opacity: Math.random() * 0.6 + 0.2,
               }}
             />
           ))}
         </div>
 
-        <ParallaxSection speed={0.4}>
+        <ParallaxSection speed={0.25}>
           <div className="relative text-center max-w-3xl mx-auto">
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gradient">
+            <h2 
+              className="text-5xl md:text-6xl font-bold mb-6 text-gradient"
+              style={{
+                transform: `translateY(${scrollProgress * -20}px)`,
+              }}
+            >
               The Universe Awaits
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p 
+              className="text-xl text-muted-foreground mb-8"
+              style={{
+                transform: `translateY(${scrollProgress * -10}px)`,
+              }}
+            >
               Every star, every planet, every nebula holds countless wonders yet to be discovered. 
               The cosmos is infinite, and so are the possibilities.
             </p>

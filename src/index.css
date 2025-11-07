@@ -96,6 +96,11 @@ All colors MUST be HSL.
   html {
     scroll-behavior: smooth;
   }
+  
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 @layer utilities {
