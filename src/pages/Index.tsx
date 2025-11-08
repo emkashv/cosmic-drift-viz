@@ -3,17 +3,14 @@ import { ChatMessage } from '@/components/ChatMessage';
 import { ChatInput } from '@/components/ChatInput';
 import { useChat } from '@/hooks/useChat';
 import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Index = () => {
   const { messages, sendMessage, isLoading } = useChat();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
@@ -25,7 +22,7 @@ const Index = () => {
           </p>
         </div>
 
-        <ScrollArea className="flex-1 p-6" ref={scrollRef}>
+        <div className="flex-1 overflow-y-auto p-6">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               <p>Начните диалог, отправив сообщение</p>
@@ -46,7 +43,8 @@ const Index = () => {
               </div>
             </div>
           )}
-        </ScrollArea>
+          <div ref={messagesEndRef} />
+        </div>
 
         <div className="p-6 border-t bg-card">
           <ChatInput onSend={sendMessage} disabled={isLoading} />
