@@ -16,9 +16,9 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl">
         <div className="p-6 border-b bg-card">
-          <h1 className="text-2xl font-bold text-foreground">AI Чат</h1>
+          <h1 className="text-2xl font-bold text-foreground">Ares AI</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Задайте любой вопрос и получите ответ
+            Developed for an easier life
           </p>
         </div>
 
