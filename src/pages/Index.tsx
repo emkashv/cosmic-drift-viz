@@ -260,7 +260,7 @@ const Index = () => {
               </div>
               <h2 className="text-2xl font-semibold mb-2">Привет! Я Ares</h2>
               <p className="text-muted-foreground max-w-md">
-                Я помогу вам с программированием, анализом данных, работой с изображениями и многим другим
+                Создан чтобы делать жизнь лучше
               </p>
             </div>
           ) : (
@@ -279,51 +279,36 @@ const Index = () => {
                 <div
                   key={idx}
                   className={cn(
-                    'flex gap-4 mb-8 animate-fade-in',
+                    'flex w-full mb-6 animate-fade-in',
                     isUser ? 'justify-end' : 'justify-start'
                   )}
                 >
-                  {!isUser && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-                      <Sparkles className="h-4 w-4 text-white" />
-                    </div>
-                  )}
-                  <div className={cn('flex-1 max-w-[85%]', isUser && 'flex justify-end')}>
-                    <div className={cn(
-                      'rounded-2xl px-4 py-3',
-                      isUser 
-                        ? 'bg-primary text-primary-foreground ml-auto' 
-                        : 'bg-muted text-foreground'
-                    )}>
-                      {images.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {images.map((img: any, imgIdx: number) => (
-                            <img
-                              key={imgIdx}
-                              src={img.image_url.url}
-                              alt="Attached"
-                              className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
-                            />
-                          ))}
-                        </div>
-                      )}
-                      <p className="whitespace-pre-wrap break-words">{textContent}</p>
-                    </div>
+                  <div className={cn(
+                    'max-w-[85%] rounded-2xl px-4 py-3',
+                    isUser 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted text-foreground'
+                  )}>
+                    {images.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {images.map((img: any, imgIdx: number) => (
+                          <img
+                            key={imgIdx}
+                            src={img.image_url.url}
+                            alt="Attached"
+                            className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <p className="whitespace-pre-wrap break-words">{textContent}</p>
                   </div>
-                  {isUser && (
-                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-                      <span className="text-sm font-semibold text-primary-foreground">Я</span>
-                    </div>
-                  )}
                 </div>
               );
             })
           )}
           {isLoading && (
-            <div className="flex gap-4 mb-8">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
+            <div className="flex justify-start mb-6">
               <div className="bg-muted rounded-2xl px-4 py-3">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
