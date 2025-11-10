@@ -4,30 +4,93 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Send } from 'lucide-react';
+import { Send, Paperclip, X } from 'lucide-react';
+
+type MessageContent = string | { type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } };
 
 type Message = {
   role: 'user' | 'assistant';
-  content: string;
+  content: string | MessageContent[];
+};
+
+type AttachedFile = {
+  name: string;
+  type: string;
+  url: string;
 };
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState('');
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const sendMessage = async (messageInput: string) => {
-    if (!messageInput.trim()) return;
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
 
-    const userMessage: Message = { role: 'user', content: messageInput };
+    const newFiles: AttachedFile[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      
+      await new Promise((resolve) => {
+        reader.onload = (e) => {
+          const url = e.target?.result as string;
+          newFiles.push({
+            name: file.name,
+            type: file.type,
+            url: url,
+          });
+          resolve(null);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    
+    setAttachedFiles((prev) => [...prev, ...newFiles]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const sendMessage = async (messageInput: string) => {
+    if (!messageInput.trim() && attachedFiles.length === 0) return;
+
+    const content: MessageContent[] = [];
+    
+    if (messageInput.trim()) {
+      content.push({ type: 'text', text: messageInput });
+    }
+    
+    attachedFiles.forEach(file => {
+      content.push({
+        type: 'image_url',
+        image_url: { url: file.url }
+      });
+    });
+
+    const userMessage: Message = { 
+      role: 'user', 
+      content: content.length === 1 && typeof content[0] === 'object' && 'text' in content[0] 
+        ? content[0].text 
+        : content 
+    };
+    
     setMessages((prev) => [...prev, userMessage]);
+    setAttachedFiles([]);
     setIsLoading(true);
 
     let assistantContent = '';
@@ -152,7 +215,7 @@ const Index = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
     sendMessage(input);
     setInput('');
     if (textareaRef.current) {
@@ -191,6 +254,15 @@ const Index = () => {
           ) : (
             messages.map((msg, idx) => {
               const isUser = msg.role === 'user';
+              const textContent = typeof msg.content === 'string' 
+                ? msg.content 
+                : Array.isArray(msg.content)
+                  ? msg.content.find(c => typeof c === 'object' && 'text' in c)?.text || ''
+                  : '';
+              const images = Array.isArray(msg.content)
+                ? msg.content.filter(c => typeof c === 'object' && 'image_url' in c)
+                : [];
+              
               return (
                 <div
                   key={idx}
@@ -207,7 +279,19 @@ const Index = () => {
                         : 'bg-muted text-foreground'
                     )}
                   >
-                    <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                    {images.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {images.map((img: any, imgIdx: number) => (
+                          <img
+                            key={imgIdx}
+                            src={img.image_url.url}
+                            alt="Attached"
+                            className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <p className="whitespace-pre-wrap break-words">{textContent}</p>
                   </div>
                 </div>
               );
@@ -228,7 +312,50 @@ const Index = () => {
         </div>
 
         <div className="p-6 border-t bg-card">
+          {attachedFiles.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3 p-2 bg-muted/50 rounded-lg">
+              {attachedFiles.map((file, idx) => (
+                <div key={idx} className="relative group">
+                  <div className="flex items-center gap-2 bg-background px-3 py-2 rounded-lg border">
+                    {file.type.startsWith('image/') ? (
+                      <img src={file.url} alt={file.name} className="w-12 h-12 rounded object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center bg-muted rounded">
+                        <Paperclip className="h-5 w-5" />
+                      </div>
+                    )}
+                    <span className="text-sm max-w-[100px] truncate">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(idx)}
+                      className="ml-2 p-1 hover:bg-destructive/10 rounded-full transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileSelect}
+              multiple
+              accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+              className="hidden"
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="h-[60px] w-[60px] shrink-0"
+              disabled={isLoading}
+            >
+              <Paperclip className="h-5 w-5" />
+            </Button>
             <Textarea
               ref={textareaRef}
               value={input}
@@ -242,7 +369,7 @@ const Index = () => {
               type="submit" 
               size="icon" 
               className="h-[60px] w-[60px] shrink-0"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || (!input.trim() && attachedFiles.length === 0)}
             >
               <Send className="h-5 w-5" />
             </Button>
