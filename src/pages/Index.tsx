@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Send, Paperclip, X } from 'lucide-react';
+import { Send, Paperclip, X, Sparkles } from 'lucide-react';
 
 type MessageContent = string | { type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } };
 
@@ -237,19 +236,32 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl">
-        <div className="p-6 border-b bg-card">
-          <h1 className="text-2xl font-bold text-foreground">Ares AI</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Developed for an easier life
-          </p>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <Sparkles className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-foreground">Ares AI</h1>
+            <p className="text-xs text-muted-foreground">Developed for an easier life</p>
+          </div>
         </div>
+      </header>
 
-        <div className="flex-1 overflow-y-auto p-6">
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-3xl mx-auto px-4 py-8">
           {messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              <p>Начните диалог, отправив сообщение</p>
+            <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                <Sparkles className="h-8 w-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-semibold mb-2">Привет! Я Ares</h2>
+              <p className="text-muted-foreground max-w-md">
+                Я помогу вам с программированием, анализом данных, работой с изображениями и многим другим
+              </p>
             </div>
           ) : (
             messages.map((msg, idx) => {
@@ -267,38 +279,51 @@ const Index = () => {
                 <div
                   key={idx}
                   className={cn(
-                    'flex w-full mb-4 animate-fade-in',
+                    'flex gap-4 mb-8 animate-fade-in',
                     isUser ? 'justify-end' : 'justify-start'
                   )}
                 >
-                  <div
-                    className={cn(
-                      'max-w-[80%] rounded-2xl px-4 py-3 shadow-sm',
-                      isUser
-                        ? 'bg-primary text-primary-foreground'
+                  {!isUser && (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                      <Sparkles className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+                  <div className={cn('flex-1 max-w-[85%]', isUser && 'flex justify-end')}>
+                    <div className={cn(
+                      'rounded-2xl px-4 py-3',
+                      isUser 
+                        ? 'bg-primary text-primary-foreground ml-auto' 
                         : 'bg-muted text-foreground'
-                    )}
-                  >
-                    {images.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {images.map((img: any, imgIdx: number) => (
-                          <img
-                            key={imgIdx}
-                            src={img.image_url.url}
-                            alt="Attached"
-                            className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
-                          />
-                        ))}
-                      </div>
-                    )}
-                    <p className="whitespace-pre-wrap break-words">{textContent}</p>
+                    )}>
+                      {images.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {images.map((img: any, imgIdx: number) => (
+                            <img
+                              key={imgIdx}
+                              src={img.image_url.url}
+                              alt="Attached"
+                              className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <p className="whitespace-pre-wrap break-words">{textContent}</p>
+                    </div>
                   </div>
+                  {isUser && (
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <span className="text-sm font-semibold text-primary-foreground">Я</span>
+                    </div>
+                  )}
                 </div>
               );
             })
           )}
           {isLoading && (
-            <div className="flex justify-start mb-4">
+            <div className="flex gap-4 mb-8">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
               <div className="bg-muted rounded-2xl px-4 py-3">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
@@ -310,8 +335,11 @@ const Index = () => {
           )}
           <div ref={messagesEndRef} />
         </div>
+      </div>
 
-        <div className="p-6 border-t bg-card">
+      {/* Input Area */}
+      <div className="sticky bottom-0 border-t bg-background/80 backdrop-blur-sm">
+        <div className="max-w-3xl mx-auto px-4 py-4">
           {attachedFiles.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3 p-2 bg-muted/50 rounded-lg">
               {attachedFiles.map((file, idx) => (
@@ -337,7 +365,7 @@ const Index = () => {
               ))}
             </div>
           )}
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSubmit} className="flex items-end gap-2">
             <input
               ref={fileInputRef}
               type="file"
@@ -349,33 +377,35 @@ const Index = () => {
             <Button
               type="button"
               size="icon"
-              variant="outline"
+              variant="ghost"
               onClick={() => fileInputRef.current?.click()}
-              className="h-[60px] w-[60px] shrink-0"
+              className="h-10 w-10 shrink-0 rounded-full"
               disabled={isLoading}
             >
               <Paperclip className="h-5 w-5" />
             </Button>
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={handleInput}
-              onKeyDown={handleKeyDown}
-              placeholder="Введите сообщение..."
-              className="min-h-[60px] max-h-[200px] resize-none"
-              disabled={isLoading}
-            />
-            <Button 
-              type="submit" 
-              size="icon" 
-              className="h-[60px] w-[60px] shrink-0"
-              disabled={isLoading || (!input.trim() && attachedFiles.length === 0)}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            <div className="flex-1 relative">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleInput}
+                onKeyDown={handleKeyDown}
+                placeholder="Отправить сообщение Ares..."
+                className="min-h-[52px] max-h-[200px] resize-none pr-12 rounded-3xl border-2"
+                disabled={isLoading}
+              />
+              <Button 
+                type="submit" 
+                size="icon" 
+                className="absolute right-2 bottom-2 h-8 w-8 rounded-full"
+                disabled={isLoading || (!input.trim() && attachedFiles.length === 0)}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </form>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
