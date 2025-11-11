@@ -198,4 +198,27 @@ All colors MUST be HSL.
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+  
+  /* Cosmic Stars Animation */
+  .stars {
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, white, transparent),
+      radial-gradient(2px 2px at 60px 70px, white, transparent),
+      radial-gradient(1px 1px at 50px 50px, white, transparent),
+      radial-gradient(1px 1px at 130px 80px, white, transparent),
+      radial-gradient(2px 2px at 90px 10px, white, transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: stars-drift 40s linear infinite;
+    opacity: 0.6;
+  }
+
+  @keyframes stars-drift {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-200px);
+    }
+  }
 }

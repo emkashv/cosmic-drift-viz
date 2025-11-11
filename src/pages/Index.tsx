@@ -236,22 +236,29 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+      {/* Cosmic Background Animation */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-cosmic-blue/20 via-cosmic-purple/20 to-cosmic-pink/20 animate-[drift_20s_ease-in-out_infinite]" />
+        <div className="absolute inset-0 bg-gradient-to-tl from-cosmic-purple/10 via-cosmic-blue/10 to-transparent animate-[drift_25s_ease-in-out_infinite_reverse]" />
+        <div className="stars absolute inset-0" />
+      </div>
+
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-10 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-gradient-cosmic flex items-center justify-center">
             <Sparkles className="h-4 w-4 text-white" />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-foreground">Ares AI</h1>
-            <p className="text-xs text-muted-foreground">Developed for an easier life</p>
+            <p className="text-xs text-muted-foreground">Создан чтобы делать жизнь лучше</p>
           </div>
         </div>
       </header>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto relative z-[1]">
         <div className="max-w-3xl mx-auto px-4 py-8">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
@@ -323,7 +330,7 @@ const Index = () => {
       </div>
 
       {/* Input Area */}
-      <div className="sticky bottom-0 border-t bg-background/80 backdrop-blur-sm">
+      <div className="sticky bottom-0 z-10 border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-3xl mx-auto px-4 py-4">
           {attachedFiles.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3 p-2 bg-muted/50 rounded-lg">
